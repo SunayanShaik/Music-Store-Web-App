@@ -1,0 +1,43 @@
+#voilinImage{
+	background-image:url("../images/voilin.png");
+	background-repeat:"no-repeat";
+	background-position:top left;
+	background-size:content;
+	height:150px;
+	position:top;
+}
+#homeButton{
+	font-size:20px;
+}
+#companyName{
+	font-style:italic;
+	font-size:40px;
+	float:left;
+	position:center-left;
+	color:green;
+}
+.headerul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+	border: 1px solid #e7e7e7;
+   background-color: #f1f1f1;
+}
+
+li.headerli {
+    float: right;
+}
+
+a.headera {
+    display: block;
+    color: #000;
+    padding: 8px 16px;
+    text-decoration: none;
+}
+
+/* Change the link color to #111 (black) on hover */
+a.headera:hover {
+    background-color: #555;
+    color: white;
+}

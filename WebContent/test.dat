@@ -1,0 +1,14 @@
+i         
+gp        
+gpi pf01     
+ureg  joe smith joe@cs.umb.edu pw     
+ureg  sue cohen sue@cs.umb.edu pw2
+gui sue@cs.umb.edu
+gti pf01 
+dl joe@cs.umb.edu jr01 1
+cc     
+addli pf01 
+sc
+co sue@cs.umb.edu 100_Main
+gi         
+gd         

@@ -1,0 +1,94 @@
+/*C1*/SET SCHEMA SYSTEM_LOBS
+INSERT INTO BLOCKS VALUES(0,2147483647,0)
+COMMIT
+/*C2*/SET SCHEMA PUBLIC
+  CREATE TABLE product( product_id INT NOT NULL, product_code VARCHAR(10) NOT NULL, product_description VARCHAR(100) NOT NULL, product_price DECIMAL(10,2) NOT NULL, UNIQUE (product_code), PRIMARY KEY (product_id) )
+INSERT INTO PRODUCT VALUES(1,'8601','86 (the band) - True Life Songs and Pictures',14.95)
+INSERT INTO PRODUCT VALUES(2,'pf01','Paddlefoot - The first CD',12.95)
+INSERT INTO PRODUCT VALUES(3,'pf02','Paddlefoot - The second CD',14.95)
+INSERT INTO PRODUCT VALUES(4,'jr01','Joe Rut - Genuine Wood Grained Finish',14.95)
+COMMIT
+  CREATE TABLE track ( track_id INT NOT NULL PRIMARY KEY, product_id INT NOT NULL, track_number INT NOT NULL, title varchar(100) NOT NULL, sample_filename varchar(100) NOT NULL, FOREIGN KEY (product_id) REFERENCES product (product_id), UNIQUE (product_id, track_number) )
+INSERT INTO TRACK VALUES(1,1,2,'You Are a Star','star.mp3')
+INSERT INTO TRACK VALUES(2,1,3,'Don''t Make No Difference','no_difference.mp3')
+INSERT INTO TRACK VALUES(3,2,2,'Whiskey Before Breakfast','whiskey.mp3')
+INSERT INTO TRACK VALUES(4,2,6,'64 Corvair, Part 2','corvair.mp3')
+INSERT INTO TRACK VALUES(5,3,1,'Neon Lights','neon.mp3')
+INSERT INTO TRACK VALUES(6,3,3,'Tank Hill','tank.mp3')
+INSERT INTO TRACK VALUES(7,4,1,'Filter','filter.mp3')
+INSERT INTO TRACK VALUES(8,4,5,'So Long Lazy Ray','so_long.mp3')
+COMMIT
+  CREATE TABLE download ( download_id INT NOT NULL, email_address VARCHAR(50) NOT NULL, download_date TIMESTAMP NOT NULL, track_id INT NOT NULL, PRIMARY KEY (download_id), FOREIGN KEY (track_id) REFERENCES track (track_id) )
+   CREATE TABLE site_user ( user_id INT NOT NULL, firstname VARCHAR(50) NOT NULL, lastname VARCHAR(50) NOT NULL, email_address VARCHAR(50) NOT NULL, company_name VARCHAR(50), address1 VARCHAR(50), address2 VARCHAR(50), city VARCHAR(50), state VARCHAR(50), zip VARCHAR(50), country VARCHAR(50), creditcard_type VARCHAR(50), creditcard_number VARCHAR(50), creditcard_expirationdate VARCHAR(50), UNIQUE(email_address), PRIMARY KEY (user_id) )
+  CREATE TABLE invoice( invoice_id INT NOT NULL, user_id INT NOT NULL, invoice_date TIMESTAMP NOT NULL, total_amount DECIMAL(10,2) NOT NULL, is_processed CHAR(1) NOT NULL, PRIMARY KEY (invoice_id), FOREIGN KEY (user_id) REFERENCES site_user (user_id) )
+  CREATE TABLE lineitem( lineitem_id INT NOT NULL, invoice_id INT NOT NULL, product_code VARCHAR(10) NOT NULL, quantity INT NOT NULL, PRIMARY KEY (lineitem_id), FOREIGN KEY (invoice_id) REFERENCES invoice (invoice_id) )
+  CREATE TABLE userpass ( username varchar(15) NOT NULL PRIMARY KEY, password varchar(15) NOT NULL )
+INSERT INTO USERPASS VALUES('andrea','sesame')
+INSERT INTO USERPASS VALUES('joel','sesame')
+INSERT INTO USERPASS VALUES('anne','sesame')
+COMMIT
+  CREATE TABLE userrole ( username VARCHAR(15) NOT NULL, rolename VARCHAR(15) NOT NULL, PRIMARY KEY (username, rolename) )
+INSERT INTO USERROLE VALUES('andrea','service')
+INSERT INTO USERROLE VALUES('andrea','programmer')
+INSERT INTO USERROLE VALUES('joel','programmer')
+COMMIT
+  create table music_sys_tab ( invoice_id integer not null, user_id integer not null, download_id integer not null, lineitem_id integer not null)
+INSERT INTO MUSIC_SYS_TAB VALUES(1,1,1,1)
+COMMIT
+DISCONNECT
+/*C3*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C5*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C10*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C11*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C12*/SET SCHEMA PUBLIC
+ drop table download
+ drop table track
+ drop table lineitem
+ drop table product
+ drop table invoice
+ drop table site_user
+ drop table userpass
+ drop table userrole
+ drop table music_sys_tab
+DISCONNECT
+/*C13*/SET SCHEMA PUBLIC
+  CREATE TABLE product( product_id INT NOT NULL, product_code VARCHAR(10) NOT NULL, product_description VARCHAR(100) NOT NULL, product_price DECIMAL(10,2) NOT NULL, UNIQUE (product_code), PRIMARY KEY (product_id) )
+INSERT INTO PRODUCT VALUES(1,'8601','86 (the band) - True Life Songs and Pictures',14.95)
+INSERT INTO PRODUCT VALUES(2,'pf01','Paddlefoot - The first CD',12.95)
+INSERT INTO PRODUCT VALUES(3,'pf02','Paddlefoot - The second CD',14.95)
+INSERT INTO PRODUCT VALUES(4,'jr01','Joe Rut - Genuine Wood Grained Finish',14.95)
+COMMIT
+  CREATE TABLE track ( track_id INT NOT NULL PRIMARY KEY, product_id INT NOT NULL, track_number INT NOT NULL, title varchar(100) NOT NULL, sample_filename varchar(100) NOT NULL, FOREIGN KEY (product_id) REFERENCES product (product_id), UNIQUE (product_id, track_number) )
+INSERT INTO TRACK VALUES(1,1,2,'You Are a Star','star.mp3')
+INSERT INTO TRACK VALUES(2,1,3,'Don''t Make No Difference','no_difference.mp3')
+INSERT INTO TRACK VALUES(3,2,2,'Whiskey Before Breakfast','whiskey.mp3')
+INSERT INTO TRACK VALUES(4,2,6,'64 Corvair, Part 2','corvair.mp3')
+INSERT INTO TRACK VALUES(5,3,1,'Neon Lights','neon.mp3')
+INSERT INTO TRACK VALUES(6,3,3,'Tank Hill','tank.mp3')
+INSERT INTO TRACK VALUES(7,4,1,'Filter','filter.mp3')
+INSERT INTO TRACK VALUES(8,4,5,'So Long Lazy Ray','so_long.mp3')
+COMMIT
+  CREATE TABLE download ( download_id INT NOT NULL, email_address VARCHAR(50) NOT NULL, download_date TIMESTAMP NOT NULL, track_id INT NOT NULL, PRIMARY KEY (download_id), FOREIGN KEY (track_id) REFERENCES track (track_id) )
+   CREATE TABLE site_user ( user_id INT NOT NULL, firstname VARCHAR(50) NOT NULL, lastname VARCHAR(50) NOT NULL, email_address VARCHAR(50) NOT NULL, company_name VARCHAR(50), address1 VARCHAR(50), address2 VARCHAR(50), city VARCHAR(50), state VARCHAR(50), zip VARCHAR(50), country VARCHAR(50), creditcard_type VARCHAR(50), creditcard_number VARCHAR(50), creditcard_expirationdate VARCHAR(50), UNIQUE(email_address), PRIMARY KEY (user_id) )
+  CREATE TABLE invoice( invoice_id INT NOT NULL, user_id INT NOT NULL, invoice_date TIMESTAMP NOT NULL, total_amount DECIMAL(10,2) NOT NULL, is_processed CHAR(1) NOT NULL, PRIMARY KEY (invoice_id), FOREIGN KEY (user_id) REFERENCES site_user (user_id) )
+  CREATE TABLE lineitem( lineitem_id INT NOT NULL, invoice_id INT NOT NULL, product_code VARCHAR(10) NOT NULL, quantity INT NOT NULL, PRIMARY KEY (lineitem_id), FOREIGN KEY (invoice_id) REFERENCES invoice (invoice_id) )
+  CREATE TABLE userpass ( username varchar(15) NOT NULL PRIMARY KEY, password varchar(15) NOT NULL )
+INSERT INTO USERPASS VALUES('andrea','sesame')
+INSERT INTO USERPASS VALUES('joel','sesame')
+INSERT INTO USERPASS VALUES('anne','sesame')
+COMMIT
+  CREATE TABLE userrole ( username VARCHAR(15) NOT NULL, rolename VARCHAR(15) NOT NULL, PRIMARY KEY (username, rolename) )
+INSERT INTO USERROLE VALUES('andrea','service')
+INSERT INTO USERROLE VALUES('andrea','programmer')
+INSERT INTO USERROLE VALUES('joel','programmer')
+COMMIT
+  create table music_sys_tab ( invoice_id integer not null, user_id integer not null, download_id integer not null, lineitem_id integer not null)
+INSERT INTO MUSIC_SYS_TAB VALUES(1,1,1,1)
+COMMIT
+DISCONNECT
+/*C14*/SET SCHEMA PUBLIC
+DISCONNECT

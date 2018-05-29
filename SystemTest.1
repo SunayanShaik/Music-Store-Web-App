@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+  <HEAD><TITLE>A Servlet running SystemTest</TITLE></HEAD>
+  <BODY>
+ <h2> SystemTest Result </h2>
+<p> cs636.music.service.ServiceException: Can't initialize DB: (probably need to load DB)
+  cause: java.sql.SQLException: Cannot create PoolableConnectionFactory (IO Error: The Network Adapter could not establish the connection)
+    cause's cause: java.sql.SQLRecoverableException: IO Error: The Network Adapter could not establish the connectioncs636.music.service.ServiceException: Can't initialize DB: (probably need to load DB)
+	at cs636.music.service.SalesService.initializeDB(SalesService.java:276)
+	at cs636.music.presentation.SystemTest.run(SystemTest.java:102)
+	at cs636.music.presentation.web.SysTestServlet.doGet(SysTestServlet.java:74)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:635)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:742)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:231)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:52)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:198)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:96)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:478)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:140)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:80)
+	at org.apache.catalina.valves.AbstractAccessLogValve.invoke(AbstractAccessLogValve.java:650)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:87)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:342)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:799)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:66)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:868)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1457)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:49)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
+	at java.lang.Thread.run(Unknown Source)
+Caused by: java.sql.SQLException: Cannot create PoolableConnectionFactory (IO Error: The Network Adapter could not establish the connection)
+	at org.apache.tomcat.dbcp.dbcp2.BasicDataSource.createPoolableConnectionFactory(BasicDataSource.java:2303)
+	at org.apache.tomcat.dbcp.dbcp2.BasicDataSource.createDataSource(BasicDataSource.java:2043)
+	at org.apache.tomcat.dbcp.dbcp2.BasicDataSource.getConnection(BasicDataSource.java:1543)
+	at cs636.music.dao.SalesDbDAO.initializeDb(SalesDbDAO.java:34)
+	at cs636.music.service.SalesService.initializeDB(SalesService.java:274)
+	... 26 more
+Caused by: java.sql.SQLRecoverableException: IO Error: The Network Adapter could not establish the connection
+	at oracle.jdbc.driver.T4CConnection.logon(T4CConnection.java:743)
+	at oracle.jdbc.driver.PhysicalConnection.connect(PhysicalConnection.java:662)
+	at oracle.jdbc.driver.T4CDriverExtension.getConnection(T4CDriverExtension.java:32)
+	at oracle.jdbc.driver.OracleDriver.connect(OracleDriver.java:560)
+	at org.apache.tomcat.dbcp.dbcp2.DriverConnectionFactory.createConnection(DriverConnectionFactory.java:38)
+	at org.apache.tomcat.dbcp.dbcp2.PoolableConnectionFactory.makeObject(PoolableConnectionFactory.java:257)
+	at org.apache.tomcat.dbcp.dbcp2.BasicDataSource.validateConnectionFactory(BasicDataSource.java:2313)
+	at org.apache.tomcat.dbcp.dbcp2.BasicDataSource.createPoolableConnectionFactory(BasicDataSource.java:2299)
+	... 30 more
+Caused by: oracle.net.ns.NetException: The Network Adapter could not establish the connection
+	at oracle.net.nt.ConnStrategy.execute(ConnStrategy.java:470)
+	at oracle.net.resolver.AddrResolution.resolveAndExecute(AddrResolution.java:506)
+	at oracle.net.ns.NSProtocol.establishConnection(NSProtocol.java:595)
+	at oracle.net.ns.NSProtocol.connect(NSProtocol.java:230)
+	at oracle.jdbc.driver.T4CConnection.connect(T4CConnection.java:1452)
+	at oracle.jdbc.driver.T4CConnection.logon(T4CConnection.java:496)
+	... 37 more
+Caused by: java.net.ConnectException: Connection refused: connect
+	at java.net.DualStackPlainSocketImpl.waitForConnect(Native Method)
+	at java.net.DualStackPlainSocketImpl.socketConnect(Unknown Source)
+	at java.net.AbstractPlainSocketImpl.doConnect(Unknown Source)
+	at java.net.AbstractPlainSocketImpl.connectToAddress(Unknown Source)
+	at java.net.AbstractPlainSocketImpl.connect(Unknown Source)
+	at java.net.PlainSocketImpl.connect(Unknown Source)
+	at java.net.SocksSocketImpl.connect(Unknown Source)
+	at java.net.Socket.connect(Unknown Source)
+	at oracle.net.nt.TcpNTAdapter.connect(TcpNTAdapter.java:161)
+	at oracle.net.nt.ConnOption.connect(ConnOption.java:159)
+	at oracle.net.nt.ConnStrategy.execute(ConnStrategy.java:428)
+	... 42 more
+</p>
+<p> for more info, see tomcat log </p>
+  </BODY>
+</HTML>

@@ -1,0 +1,10 @@
+JDBC drivers for Oracle, mysql, and HSQLDB: only used for client-server executions
+   (web app uses DB drivers in CATALINA_HOME/lib)
+ojdbc6.jar:  Oracle 10g JDBC driver from dbs2.cs.umb.edu's Oracle distro.
+mysql-connector-java-5.1.39-bin.jar: MySql 5 JDBC driver, downloaded from dev.mysql.com
+hsqldb.jar: v 2.3, memory-resident database, see http://www.hsqldb.org
+Other jars:
+commons-*.jar: needed for creating a DataSource object outside tomcat: see
+                 cs636.pizza.config.StandAloneDataSourceFactory
+junit-4.12.jar: Junit 4.12, for unit testing
+hamcrest-core-1.3.jar: needed for junit

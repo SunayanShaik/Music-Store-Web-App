@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app id="music3" version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+	<display-name>music3</display-name>
+	<!--  to handle requests to local path music3/ -->
+	<welcome-file-list>
+		<welcome-file>welcome.jsp</welcome-file>
+	</welcome-file-list>
+	
+	<!-- for SystemTestServlet -->
+	<servlet>
+		<description>SystemTest Servlet</description>
+		<display-name>SysTestServlet</display-name>
+		<servlet-name>SysTestServlet</servlet-name>
+		<servlet-class>cs636.music.presentation.web.SysTestServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>SysTestServlet</servlet-name>
+		<url-pattern>/servlet/SystemTest</url-pattern>
+		<!-- not load-on-startup (i.e. load-when-needed) -->
+	</servlet-mapping>
+	<servlet>
+		<description>Admin Servlet</description>
+		<display-name>AdminServlet</display-name>
+		<servlet-name>AdminServlet</servlet-name>
+		<servlet-class>cs636.music.presentation.web.AdminServlet</servlet-class>
+		<!-- make this servlet load after the dispatcher servlet -->
+		<load-on-startup>3</load-on-startup>  
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>AdminServlet</servlet-name>
+		<url-pattern>/adminController/*</url-pattern>
+	</servlet-mapping>
+	<!--  Setup for two dispatcher servlets for user pages, but you can change this to just one,
+		as is done in pizza3 -->
+	<servlet>
+		<description>MVC Catalog Dispatcher Servlet</description>
+		<display-name>CatalogDispatcherServlet</display-name>
+		<servlet-name>CatalogDispatcherServlet</servlet-name>
+		<servlet-class>cs636.music.presentation.web.CatalogDispatcherServlet</servlet-class>
+		<!-- make this servlet load at web app startup (including redeployment) -->
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<!-- We use *.html for page-to-page catalog URLs in this app: all these URLs 
+	    point to the CatalogDispatcherServlet -->
+	<servlet-mapping>
+		<servlet-name>CatalogDispatcherServlet</servlet-name>
+		<url-pattern>/catalog/*</url-pattern>
+	</servlet-mapping>
+	<!-- Note that if we use two dispatcher servlets for user pages, we need different-looking
+	     URLs for each so that we can route requests to the right servlet. 
+	     Here is one way: use .do URLs for the CatalogDispatcherServlet -->
+	<!--<servlet-mapping>
+		<servlet-name>CatalogDispatcherServlet</servlet-name>
+		<url-pattern>*.do</url-pattern>
+	</servlet-mapping> -->
+	<servlet>
+		<description>MVC Dispatcher Servlet</description>
+		<display-name>SalesDispatcherServlet</display-name>
+		<servlet-name>SalesDispatcherServlet</servlet-name>
+		<servlet-class>cs636.music.presentation.web.SalesDispatcherServlet</servlet-class>
+		<!-- make this servlet load at web app startup (including redeployment) -->
+		<load-on-startup>2</load-on-startup> 
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>SalesDispatcherServlet</servlet-name>
+		<url-pattern>/sales/*</url-pattern>
+	</servlet-mapping>
+	<error-page>
+		<exception-type>java.lang.Throwable</exception-type>
+		<location>/error/java_error.jsp</location>
+	</error-page>
+	<error-page>
+		<error-code>404</error-code>
+		<location>/error/error_404.jsp</location>
+	</error-page>
+	
+</web-app>

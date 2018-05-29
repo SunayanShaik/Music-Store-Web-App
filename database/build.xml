@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- CS636 database utilities (almost the same as pizza1's database/build.xml)
+    Requires JDK's bin and ant's bin on command-line's path (check that javac 
+      and ant work on the command line)
+    Requires env variables ORACLE_SITE, ORACLE_USER, ORACLE_PW, and
+      MYSQL_SITE, MYSQL_USER, MYSQL_PW
+ -->
+<!-- ORACLE_SITE should be "localhost:1521:dbs3" at home (for
+	tunnel to dbs3.cs.umb.edu), and "dbs3.cs.umb.edu:1521:dbs3" at cs.umb.edu -->
+<!-- MYSQL_SITE should be "localhost:3333" at home (for
+	tunnel to topcat.cs.umb.edu), and "topcat.cs.umb.edu" at cs.umb.edu -->	
+<project name="music3 DBhelpers">
+	<!--Load environment variables and give them prefix "env." -->
+	<property environment="env" />
+	<property name="ORACLE_USER" value="${env.ORACLE_USER}" />
+	<property name="ORACLE_PW" value="${env.ORACLE_PW}" />
+	<property name="ORACLE_SITE" value="${env.ORACLE_SITE}" />
+	<property name="MYSQL_USER" value="${env.MYSQL_USER}" />
+	<property name="MYSQL_PW" value="${env.MYSQL_PW}" />
+	<property name="MYSQL_SITE" value="${env.MYSQL_SITE}" />
+	
+	<property name="ORACLE_URL" value="jdbc:oracle:thin:@${ORACLE_SITE}"/>
+	<property name="MYSQL_URL" value = "jdbc:mysql://${env.MYSQL_SITE}/${MYSQL_USER}db"/>
+	<property name="HSQL_URL" value = "jdbc:hsqldb:hsql://localhost/"/>
+	
+	<path id="project.classpath">
+		<fileset dir="../lib">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+	<!-- ==========================Oracle DB helpers================== -->
+	<!-- Oracle should always be up and ready to work for you, so all you have to
+		do is load the tables once and use it. From home, you need a "tunnel"
+		to access the Oracle port.
+	-->
+	<target name="load-oradb" description="Load Oracle database">
+		<sql classpathref="project.classpath" driver="oracle.jdbc.OracleDriver" 
+			url="${ORACLE_URL}" userid="${ORACLE_USER}" 
+			password="${ORACLE_PW}" src="createdb.sql" />
+	</target>
+	<!-- special for music project: add downloads for testing queries -->
+	<target name="load-oradb-dl" description="Load Oracle download table">
+			<sql classpathref="project.classpath" driver="oracle.jdbc.OracleDriver" 
+				url="${ORACLE_URL}" userid="${ORACLE_USER}"
+				password="${ORACLE_PW}" src="load_downloads.sql" />
+	</target>
+	
+	<target name="show-oradb" description="Display Oracle tables">
+		<sql classpathref="project.classpath" driver="oracle.jdbc.OracleDriver" 
+			url="${ORACLE_URL}" userid="${ORACLE_USER}" 
+			password="${ORACLE_PW}" print="true" src="showdb.sql">
+		</sql>
+	</target>
+	<!-- use onerror continue to keep going if a table is not there -->
+	<target name="drop-oradb" description="drop Oracle tables">
+		<sql classpathref="project.classpath" driver="oracle.jdbc.OracleDriver" 
+			url="${ORACLE_URL}" userid="${ORACLE_USER}" 
+			password="${ORACLE_PW}" src="dropdb.sql" onerror="continue" />
+	</target>
+
+	<!-- ==========================MySql DB helpers================== -->
+	<!-- Mysql should always be up and ready to work for you, so all you have to
+		do is load the tables once and use it. 
+	-->
+	<target name="load-mysqldb" description="Load Mysql database">
+		<sql classpathref="project.classpath" driver="com.mysql.jdbc.Driver" 
+			url="${MYSQL_URL}" userid="${MYSQL_USER}" 
+			password="${MYSQL_PW}" src="createdb.sql" />
+	</target>
+	
+	<!-- special for music project: add downloads for testing queries -->
+	<target name="load-mysqldb-dl" description="Load Mysql download table">
+		<sql classpathref="project.classpath" driver="com.mysql.jdbc.Driver" 
+			url="${MYSQL_URL}" userid="${MYSQL_USER}" 
+			password="${MYSQL_PW}" src="load_downloads.sql" />
+	</target>
+
+	<target name="show-mysqldb" description="Display tables">
+		<sql classpathref="project.classpath" driver="com.mysql.jdbc.Driver" 
+			url="${MYSQL_URL}" userid="${MYSQL_USER}" 
+			password="${MYSQL_PW}" print="true" src="showdb.sql">
+		</sql>
+	</target>
+	<target name="drop-mysqldb" description="drop Mysql tables">
+		<sql classpathref="project.classpath" driver="com.mysql.jdbc.Driver" 
+			url="${MYSQL_URL}" userid="${MYSQL_USER}" 
+			password="${MYSQL_PW}" src="dropdb.sql" onerror="continue" />
+	</target>
+
+	<!-- ==========================HSQLDB helpers================== -->
+	<!-- Unlike Oracle, HSQLDB comes and goes at our whim. We start it up when we
+			want to use it, leave it running in a process while we do our testing,
+			and then bring it down.  Each time we bring it up, we make it start off
+			empty, so we need to load the tables before running the app.
+		-->
+	<!-- Start the HSQL DB server: do this before running apps -->
+	<target name="start-hsqldb" description="Run HSQL database server">
+		<!-- Delete HSQLDB's database script and log, its record of past actions -->
+		<!-- That way, it starts off empty of data -->
+		<delete file="hsqlfile.script" failonerror="false"/>
+		<delete file="hsqlfile.log" failonerror="false"/>
+		<delete file="hsqlfile.properties" failonerror="false"/>
+		<java classname="org.hsqldb.Server" fork="true" classpathref="project.classpath" 
+			failonerror="true">
+			<arg line="--database.0 file:hsqlfile" /> 
+		</java>
+	</target>
+
+	<target name="shutdown-hsqldb" description="Shutdown HSQL database">
+		<sql classpathref="project.classpath" driver="org.hsqldb.jdbcDriver" 
+			url="${HSQL_URL}" userid="sa" password="" autocommit="true">
+	       shutdown
+	       </sql>
+	</target>
+
+	<target name="load-hsqldb" description="Load HSQL database">
+		<sql classpathref="project.classpath" driver="org.hsqldb.jdbcDriver" 
+			url="${HSQL_URL}" userid="sa" password="" src="createdb.sql" />
+	</target>
+	<target name="load-hsqldb-dl" description="Load HSQL download table">
+			<sql classpathref="project.classpath" driver="org.hsqldb.jdbcDriver" 
+				url="${HSQL_URL}" userid="sa" password="" src="load_downloads.sql" />
+		</target>
+	<target name="show-hsqldb" description="Show  HSQL database ">
+		<sql classpathref="project.classpath" driver="org.hsqldb.jdbcDriver" 
+			url="${HSQL_URL}" userid="sa" password="" src="showdb.sql" print="true" />
+	</target>
+	<target name="drop-hsqldb" description="Drop HSQL database">
+		<sql classpathref="project.classpath" driver="org.hsqldb.jdbcDriver" 
+			url="${HSQL_URL}" userid="sa" password="" src="dropdb.sql" 
+			onerror="continue" />
+	</target>
+
+</project>

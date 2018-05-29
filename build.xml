@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="music3" default="build" basedir=".">
+<!--  CS636 music3 build file 
+Requires environment variables 
+  ORACLE_USER, ORACLE_PW, ORACLE_SITE, MYSQL_USER, 
+  MYSQL_PW, and MYSQL_SITE for client-server case,
+      and also needed for unit tests of web project. 
+  CATALINA_HOME and TOMCAT_URL for web case.
+  Requires database tables set up: use build.xml in subdirectory database.
+Most useful targets:
+  ant test   run all unit tests using HSQLDB
+  ant hsqlSysTest  run SystemTest with HSQLDB
+  ant oraSysTest  run SystemTest with Oracle (use tunnel at home)
+  ant mysqlSysTest  run SystemTest with Mysql (use tunnel at home)
+  ant deploy-hsqldb deploy web app using hsqldb
+  ant deploy-oradb deploy web app using oracle (use tunnel at home)
+  ant deploy-mysqldb deploy web app using mysqldb (use tunnel at home) 
+  ant deploy-oradb-mysqldb deploy web app using ora for sales, mysql for catalog
+  ant webSysTest     run SystemTest from a servlet using wget 
+  ant webSysTestc    run SystemTest from a servlet using curl     
+-->
+	<!-- Global properties for this build -->
+	<property environment="env" />
+	<!-- on PC, maybe c:\tomcat-8.0, on cs.umb Linux, /home/username/cs636/tomcat-8.0 -->
+	<property name="CATALINA_HOME" value="${env.CATALINA_HOME}" />
+	<!-- on PC, http://localhost:8080, on cs.umb Linux http://topcat.cs.umb.edu:xxxxx  -->
+	<property name="TOMCAT_URL" value="${env.TOMCAT_URL}" />
+	<property name="deploy.dir" value="${CATALINA_HOME}/webapps/${ant.project.name}" />
+
+	<property name="database.dir" value="database" />
+	<property name="src.dir" value="src" />
+	<property name="webinf.dir" value="WebContent/WEB-INF" />
+	<!-- Note new location of classes, even in client-server case-->
+	<property name="classes.dir" value="${webinf.dir}/classes" />
+	<!-- the main set of jars is set that is deployed with the web app -->
+	<property name="lib.dir" value="${webinf.dir}/lib" />
+	<!-- lib has jars needed only for clientserver case, add-ons to main set,
+	     which includes all the driver jars.  Note that we do not need to *deploy* 
+	     (i.e., install with the web app) the driver jars, because they
+	      are not directly used in the web app case. Instead, we need to
+	      make sure they are in tomcat's lib dir, so tomcat can create the needed
+	      Datasource objects. The preconfigured tomcat has the needed driver jars.
+	   -->
+	<property name="clientserver-lib.dir" value="lib" />
+	<property name="ORACLE_URL" value="jdbc:oracle:thin:@${env.ORACLE_SITE}"/>
+	<property name="MYSQL_URL" value = "jdbc:mysql://${env.MYSQL_SITE}/${env.MYSQL_USER}db"/>
+
+	<!-- Classpath declaration: all jars in two lib dirs, plus one other -->
+	<path id="project.classpath">
+		<pathelement location="${classes.dir}" />
+		<fileset dir="${lib.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+		<!-- put needed JDBC drivers, junit's jar in path too -->
+		<fileset dir="${clientserver-lib.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+		<!--for compiling servlets -->
+		<pathelement location="${CATALINA_HOME}/lib/servlet-api.jar" />
+	</path>
+
+	<target name="init">
+		<mkdir dir="${classes.dir}"/>
+		<!-- delete junit test output -->
+		<delete>
+			<fileset dir="${basedir}">
+				<include name="TEST-*.txt" />
+				<include name="*.jsp"/>
+			</fileset>
+		</delete>
+	</target>
+
+	<!-- Clean up, including .class files and deployment name files-->
+	<target name="clean" depends="init" description="Clean up the derived files">
+		<delete dir="${classes.dir}" />
+		<delete>
+			<fileset dir="${basedir}">
+				<include name="WebContent/*dbName"/>
+			</fileset>
+		</delete>
+	</target>
+
+	<!-- Compile Java source, requesting extra info on deprecated methods -->
+	<target name="build" depends="init">
+		<javac srcdir="${src.dir}" debug="on" destdir="${classes.dir}" 
+			classpathref="project.classpath" includeantruntime="false">
+			<compilerarg value="-Xlint:deprecation" />
+		</javac>
+	</target>
+
+	<!-- set up one target "test" to run all unit tests using HSQLDB-->
+	<target name="test" depends="testDAO, testBL" />
+	<!-- set up "testBL" to run all BL (business layer) unit tests -->
+	<target name="testBL" depends="build">
+		<echo message="testBL1 business layer testing...look for details in TEST-*.txt"/>
+		<junit fork="true" printsummary="yes">
+			<formatter type="brief" />
+			<classpath refid="project.classpath" />
+			<batchtest fork="yes">
+				<fileset dir="${src.dir}">
+					<include name="**/service/*Test*.java" />
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
+	<!-- set up one target "testDAO" to run all DAO unit tests -->
+	<target name="testDAO" depends="build">
+		<echo message="testDAO...look for details in TEST-*.txt"/>
+		<junit fork="true" printsummary="yes">
+			<formatter type="brief"/>
+			<classpath refid="project.classpath" />
+			<batchtest fork="yes">
+				<fileset dir="${src.dir}">
+					<include name="**/dao/*Test*.java" />
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
+	
+	<!-- Clientserver tests -->
+	
+	<target name="oraSysTest" depends="build">
+		<echo message="Running SystemTest using Oracle for both sales and catalog DBs" />
+				<!-- write files with dbName to use in top level deployed directory -->
+		<echo file="WebContent/salesDbName" message = "dbs3"/>
+		<echo file="WebContent/catalogDbName" message = "dbs3"/>	
+		<java fork="true" classname="cs636.music.presentation.SystemTest" failonerror="true">
+			<classpath refid="project.classpath" />
+			<arg line="dbs3" />
+			<arg line="dbs3" />
+			<arg file="WebContent/test.dat" />
+		</java>
+	</target>
+
+	<target name="mysqlSysTest" depends="build">
+		<echo message="Running SystemTest using mysql for both sales and catalog DBs" />
+				<!-- write files with dbName to use in top level deployed directory -->
+		<echo file="WebContent/salesDbName" message = "mysql"/>
+		<echo file="WebContent/catalogDbName" message = "mysql"/>	
+		<java fork="true" classname="cs636.music.presentation.SystemTest" failonerror="true">
+			<classpath refid="project.classpath" />
+			<arg line="mysql" />
+			<arg line="mysql" />
+			<arg file="WebContent/test.dat" />
+		</java>
+	</target>
+
+	<target name="hsqlSysTest" depends="build">
+		<echo message="Running SystemTest using hsqldb for both sales and catalog DBs" />
+		<!-- write files with dbName to use in top level deployed directory -->
+		<echo file="WebContent/salesDbName" message = "hsql"/>
+		<echo file="WebContent/catalogDbName" message = "hsql"/>		
+		<java fork="true" classname="cs636.music.presentation.SystemTest" failonerror="true">
+			<classpath refid="project.classpath" />
+			<arg line="hsql"/>
+			<!-- use hsqldb for both DBs -->
+			<arg line="hsql"/>
+			<arg file="WebContent/test.dat" />
+		</java>
+	</target>
+
+	<target name="oraMysqlSysTest" depends="build">
+		<echo message="Running SystemTest using Oracle for sales DB and mysql for catalog DB" />
+		<!-- write files with dbName to use in top level deployed directory -->
+		<echo file="WebContent/salesDbName" message = "dbs3"/>
+		<echo file="WebContent/catalogDbName" message = "mysql"/>
+		<java fork="true" classname="cs636.music.presentation.SystemTest" failonerror="true">
+			<classpath refid="project.classpath" />
+			<arg line="dbs3" />
+			<arg line="mysql" />
+			<arg file="WebContent/test.dat" />
+		</java>
+	</target>
+
+	<target name="sysTest" depends="build">
+		<echo message="Running SystemTest using current deployment info" />
+		<echo message="To change deployment info, use ant deploy-hsqldb or whatever"/>
+		<echo message="Note that this only uses the names in the two deployment files, not all of WebContent"/>
+		<java fork="true" classname="cs636.music.presentation.SystemTest" failonerror="true">
+			<classpath refid="project.classpath" />
+		</java>
+	</target>
+
+	<target name="userApp" depends="build">
+		<java fork="true" classname="cs636.music.presentation.client.UserApp" failonerror="true" dir="${basedir}">
+			<classpath refid="project.classpath" />
+		</java>
+	</target>
+
+	<target name="adminApp" depends="build">
+		<java fork="true" classname="cs636.music.presentation.client.AdminApp" failonerror="true" dir="${basedir}">
+			<classpath refid="project.classpath" />
+		</java>
+	</target>
+	
+	<!-- Web App actions -->
+	
+	<target name="config-check-web">
+		<available file="WebContent/salesDbName" property="configOK" />
+		<fail message="You need to run ant deploy-xxxdb" unless="configOK" />
+		<loadfile property="salesdb" srcFile="WebContent/salesDbName" />
+		<loadfile property="catalogdb" srcFile="WebContent/catalogDbName" />
+		<echo message="config-check-web: project is deployed with salesDB ${salesdb}, catalogDB ${catalogdb}" />
+	</target>
+
+	<!-- It's hard to run browsers under scripts, but curl and wget do the same job-->
+	<!-- curl is installed on UMB Linux systems, and Mac systems, and is available for PCs,
+	   Note that Windows wget is supplied in tomcat's bin directory (wget.exe)-->
+	<target name="webTest1" depends="config-check-web">
+		<echo message="running wget for welcome.html" />
+		<exec executable="wget">
+			<arg line="${TOMCAT_URL}/${ant.project.name}/welcome.jsp" />
+		</exec>
+	</target>
+	
+	<target name="webTest2" depends="config-check-web">
+		<echo message="running wget to display product content for product ID:1" />
+		<exec executable="wget">
+			<arg line="${TOMCAT_URL}/${ant.project.name}/catalog/product.jsp?id=1" />
+		</exec>
+	</target>
+	
+	<target name="webTest1c" depends="config-check-web">
+		<echo message="running curl for welcome.html" />
+		<exec executable="curl">
+			<arg line="${TOMCAT_URL}/${ant.project.name}/welcome.html" />
+		</exec>
+	</target>
+
+	<!-- When you use this target from eclipse, your Console window will show 
+		the ant output, but if you pull down the list marked with a terminal screen
+		icon, you can select the tomcat log output to show instead-->
+	<target name="webSysTest" depends="config-check-web">
+		<echo message="running wget for SysTestServlet using current deployment info" />
+		<echo message="To change deployment info, use ant deploy-hsqldb or whatever" />
+		<exec executable="wget">
+			<arg line="${TOMCAT_URL}/${ant.project.name}/servlet/SystemTest" />
+		</exec>
+	</target>
+
+	<target name="webSysTestc" depends="config-check-web">
+		<echo message="running curl for SysTestServlet" />
+		<exec executable="curl">
+			<arg line="${TOMCAT_URL}/${ant.project.name}/servlet/SystemTest" />
+		</exec>
+	</target>
+	
+	<!-- simple deployment: copy WebContent file tree to webapps area -->
+	<!-- also, clean up first, set dbNames in files for access from servlets and SystemTest -->
+	<!-- if file copy fails, bring down tomcat first, deploy, restart tomcat -->
+	<target name="deploy-hsqldb" depends="build">
+		<!-- write files with dbName to use in top level deployed directory -->
+		<echo file="WebContent/salesDbName" message = "hsql"/>
+		<echo file="WebContent/catalogDbName" message = "hsql"/>
+		<delete dir="${deploy.dir}" />
+		<copy todir="${deploy.dir}">
+			<fileset dir="WebContent" />
+		</copy>
+	</target>
+
+	<target name="deploy-mysqldb" depends="build">
+		<!-- write file with dbName to use in top level deployed directory -->
+		<echo file="WebContent/salesDbName" message = "mysql"/>
+		<echo file="WebContent/catalogDbName" message = "mysql"/>
+		<delete dir="${deploy.dir}" />
+		<copy todir="${deploy.dir}">
+			<fileset dir="WebContent" />
+		</copy>
+	</target>
+
+	<target name="deploy-oradb" depends="build">
+		<!-- write file with dbName to use in top level deployed directory -->
+		<echo file="WebContent/salesDbName" message = "dbs3"/>
+		<echo file="WebContent/catalogDbName" message = "dbs3"/>
+		<delete dir="${deploy.dir}" />
+		<copy todir="${deploy.dir}">
+			<fileset dir="WebContent" />
+		</copy>
+	</target>
+	
+	<!-- Special case: use Oracle for sales and users, mysql for catalog -->
+	<target name="deploy-oradb-mysqldb" depends="build">
+		<!-- write file with dbName to use in top level deployed directory -->
+		<echo file="WebContent/salesDbName" message = "dbs3"/>
+		<echo file="WebContent/catalogDbName" message = "mysql"/>
+		<delete dir="${deploy.dir}" />
+		<copy todir="${deploy.dir}">
+			<fileset dir="WebContent" />
+		</copy>
+	</target>
+
+</project>

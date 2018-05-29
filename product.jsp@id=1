@@ -1,0 +1,53 @@
+
+
+			
+			
+<html>
+	<head>
+			<meta charset="utf-8">
+			<title>Raga</title>
+			<link rel="stylesheet" href = "/music3/styles/header.css;jsessionid=41D7307EA94932C8CE8471886301A678">
+			<link rel="stylesheet" href = "/music3/styles/sidebar.css;jsessionid=41D7307EA94932C8CE8471886301A678">
+			
+	</head>
+	<body>
+		<ul class="headerul">
+			<li class="headerli"><a class="headera" href="/music3/catalog/cartpage;jsessionid=41D7307EA94932C8CE8471886301A678"><img src="/music3/images/cart.png;jsessionid=41D7307EA94932C8CE8471886301A678"></a></li>
+			<li class="headerli" id="homeButton"><a class="headera" href="/music3/catalog/welcome.jsp;jsessionid=41D7307EA94932C8CE8471886301A678">Home</a></li>
+			<li class="headerli" id="companyName">Raga..</li>
+		</ul>
+		<div id= "voilinImage"></div>
+
+			
+
+		<aside>
+			<ul class="sidebarul">
+				<li class="sidebarli"><a class="sidebara" href="/music3/adminController/adminBlock;jsessionid=41D7307EA94932C8CE8471886301A678">Admin Service</a></li>
+				<li class="sidebarli"><a class="sidebara" href="/music3/catalog/catalog;jsessionid=41D7307EA94932C8CE8471886301A678">Catalog</a></li>
+				<li class="sidebarli"><a class="sidebara" href="/music3/adminController/listVariables.html;jsessionid=41D7307EA94932C8CE8471886301A678">List Variables</a></li>
+				<li class="sidebarli"><a class="sidebara" href="/music3/adminController/logout.html;jsessionid=41D7307EA94932C8CE8471886301A678">Logout</a></li>
+			</ul>
+		</aside>
+	
+
+	
+			<section class ="sidebarPlayarea">
+				<!--
+					<p style="visibility: hidden;">cs636.music.domain.Track@5c2a1c88</p>
+				
+					<p style="visibility: hidden;">cs636.music.domain.Track@34b80a33</p>
+				-->
+				<h1>86 (the band) - True Life Songs and Pictures</h1>
+				<p>Product Code: 8601</p>
+				<p>Discounted price &#36<i>14.95</i></p>
+				<br><br>
+				<a href="/music3/catalog/track.jsp;jsessionid=41D7307EA94932C8CE8471886301A678">Explore the Album!</a>
+				<br>
+				<br>
+				<br>
+				<form action="/music3/catalog/addtocart;jsessionid=41D7307EA94932C8CE8471886301A678" method="get">  
+					<input type="hidden" name="id" value="product">
+					<input type="submit" value=" Add the album to your cart" >
+				</form>
+			</section>
+		
